@@ -44,13 +44,11 @@ Now let's analyse the quality of Pharo's UUID library from a mutation testing pe
 
 ```smalltalk
 testCases :=  { UUIDPrimitivesTest }.
-classesToMutate := { UUID . UUIDGenerator }.
+classesToMutate := { UUID. UUIDGenerator }.
 
-analysis := MutationTestingAnalysis
-    testCasesFrom: testCases
-    mutating: classesToMutate
-    using: MutantOperator contents
-    with: AllTestsMethodsRunningMutantEvaluationStrategy new.
+analysis := MTAnalysis new
+    testClasses: testCases;
+    classesToMutate: classesToMutate.
 
 analysis run.
 ```
