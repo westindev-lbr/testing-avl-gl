@@ -166,16 +166,14 @@ This means that the time to run the tests will increase with larger code bases (
 For example, our previous code takes around 20 seconds to run on an Apple Silicon M1 machine.
 
 ```smalltalk
-testCases :=  { UUIDPrimitivesTest. UUIDTest . UUIDGeneratorTest }.
-classesToMutate := { UUID . UUIDGenerator }.
+testCases :=  { UUIDPrimitivesTest. UUIDTest. UUIDGeneratorTest }.
+classesToMutate := { UUID. UUIDGenerator }.
 
-analysis := MutationTestingAnalysis
-    testCasesFrom: testCases
-    mutating: classesToMutate
-    using: MutantOperator contents
-    with: AllTestsMethodsRunningMutantEvaluationStrategy new.
+analysis := MTAnalysis new
+    testClasses: testCases;
+    classesToMutate: classesToMutate.
 
-baseline := [analysis run.] timeToRun. "0:00:00:19.071"
+[analysis run.] timeToRun. "0:00:00:37.057"
 ```
 
 To allow better configurations, Mutalk uses a modular design where the user configures differents aspects of the analysis.
@@ -184,7 +182,7 @@ In this section we will see the overview of two techniques to improve such runti
 ### Changing our case study
 
 Maybe you already noticed, but the previous mutation analysis takes long time because it introduces an infinite recursion.
-Thus, there is one mutation that makes the code *very* slow and times out tests.
+Thus, there is one mutation that makes the code *very* slow and makes tests to time out.
 Also, the library has high code coverage and it's very small, so there are few chances of optimisation here.
 
 To make things more interesting, let's change our test subject to Pharo's PDF generation library.
@@ -203,24 +201,20 @@ And run mutation analysis with the following script:
 testCases := {PDFHorizontalLayoutTest. PDFBasicTest. PDFElementTest. PDFLayoutTest. PDFColorTest. PDFFontTest. PDFParagraphTest. PDFDataTypeTest. PDFGeneratorTest. PDFStreamPrinterTest}.
 classesToMutate := 'Artefact-Core' asPackage definedClasses.
 
-analysis := MutationTestingAnalysis
-    testCasesFrom: testCases
-    mutating: classesToMutate
-    using: MutantOperator contents
-    with: AllTestsMethodsRunningMutantEvaluationStrategy new.
+analysis := MTAnalysis new
+    testClasses: testCases;
+    classesToMutate: classesToMutate.
 
 analysis run.
 ```
 
-This analysis takes around 2 minute (it was 1 minute, 52 secs in my machine when I ran this).
+This analysis takes around 2 minutes (it was 1 minute, 54 secs in my machine when I ran this).
 
 ### Test selection
 
 One way to reduce the runtime of mutation testing is to run the analysis on a subset of the original tests.
-A random selection would, of course, impact the results and thus the mutation score, potentially leading to misleading results.
-In this section, we will see a conservative way to test selection: *only run tests that cover a mutant*.
-
 This technique uses code coverage as a metric:
+
 1. it first runs all tests and evaluates the code coverage of each test. Particularly, it remembers what method was covered by what test.
 2. then, it computes mutants
 3. then, we proceed to run mutations. For each mutation it:
@@ -228,25 +222,35 @@ This technique uses code coverage as a metric:
     2. runs only the tests covering the mutated method
     3. uninstall the mutation
 
-To do this using mutalk, we need to use the  `SelectingFromCoverageMutantEvaluationStrategy` class instead of `AllTestsMethodsRunningMutantEvaluationStrategy`.
+By default mutalk optimizes the execution using this technique to select tests, and stops test execution as soon as one test fails.
+There are, however, options to run all tests.
+The two snippets of code below allow us to run the analysis by running all tests, and by running all tests and not stopping on the first failure.
 
 ```smalltalk
-analysis := MutationTestingAnalysis
-    testCasesFrom: testCases
-    mutating: classesToMutate
-    using: MutantOperator contents
-    with: SelectingFromCoverageMutantEvaluationStrategy new.
+analysis := MTAnalysis new
+    testClasses: testCases;
+    classesToMutate: classesToMutate;
+    testSelectionStrategy: MTAllTestsMethodsRunningTestSelectionStrategy new.
 
-testSelection := [analysis run.] timeToRun. "0:00:01:19.115"
+analysis := MTAnalysis new
+    testClasses: testCases;
+    classesToMutate: classesToMutate;
+    testSelectionStrategy: MTAllTestsMethodsRunningTestSelectionStrategy new;
+    stopOnErrorOrFail: false.
 ```
 
-Running this on the same machine takes 30 seconds less, which means it is 1.4x faster than the original analysis.
+Running these two configurations gives us an idea of the power of these optimizations.
+Running all the tests but stopping on the first failure took 25 seconds more (2'19 seconds).
+Running without stopping on the first failure took a total of 4 minutes.
+
+Compared to the original 2 minutes, such optimizations yielded wins of 16% and 100% respectively.
 
 ```smalltalk
-(112 "seconds" / 79 "seconds") "1.4x"
+(140 "seconds" / 120 "seconds") "1.16x"
+(240 "seconds" / 120 "seconds") "2x"
 ```
 
-Of course, the gains could be even bigger for bigger projects that have low coverage.
+Of course, the gains could be even bigger for bigger projects.
 
 ### Mutant selection
 
