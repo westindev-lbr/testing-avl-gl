@@ -13,10 +13,11 @@ For this practice, you will need to:
    - execute the following expression:
   
 ```smalltalk
+Deprecation activateTransformations: false.
 Metacello new
   baseline: 'MuTalk';
   repository: 'github://pharo-contributions/mutalk:v2.3.0/src';
-  load
+  load.
 ```
 
 ## Starting with code coverage
