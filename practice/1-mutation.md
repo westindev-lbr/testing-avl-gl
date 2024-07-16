@@ -252,47 +252,37 @@ Compared to the original 2 minutes, such optimizations yielded wins of 16% and 1
 
 Of course, the gains could be even bigger for bigger projects.
 
-### Mutant selection
-
-Alternatively, we could reduce the runtime of mutation testing is to run the analysis with a subset of the original mutants.
-A naïve selection would, again of course, impact the results and thus the mutation score, potentially leading to misleading results.
-(Although research has somewhat established that random selection *works pretty well*).
-In this section, we will see a conservative way to mutant selection: *only run mutants that are covered by at least a test*.
-
-This technique uses code coverage as a metric:
-1. it first runs all tests and evaluates the code coverage of each test. Particularly, it remembers what method was covered by what test.
-2. then, it computes mutants only on those methods that are covered
-3. then, we proceed to run mutations. For each mutation it:
-    1. installs the mutation
-    2. runs the tests
-    3. uninstall the mutation
-
-
-To do this using mutalk, we need to use a new argument: the  `SelectingFromCoverageMutationsGenerationStrategy` class.
-
-```smalltalk
-analysis := MutationTestingAnalysis
-    testCasesFrom: testCases
-    mutating: classesToMutate
-    using: MutantOperator contents
-    with: AllTestsMethodsRunningMutantEvaluationStrategy new
-    with: SelectingFromCoverageMutationsGenerationStrategy new.
-
-mutantSelection := [analysis run.] timeToRun. "0:00:01:15.723"
-```
-
-Running this on the same machine takes 35 seconds less than the original, which means it is 1.5x faster than the original analysis.
-
-```smalltalk
-(112 "seconds" / 75 "seconds") "1.5x"
-```
-
-Of course, again , the gains could be even bigger for bigger projects that have low coverage.
-
 Things to think about:
 - Can you think about more trade-offs between coverage and mutation score?
 - We saw that we can use coverage to improve mutation performance. Can you think about other usages of coverage? and what about other ways to improve mutation testing performance?
 
+### Mutant selection
+
+Another very popular optimization is to reduce the runtime of mutation testing by analysing only subset of the original mutants.
+A naïve selection would impact the results and thus the mutation score, potentially leading to misleading results.
+Although, research has established that selecting random mutants *works pretty well*.
+
+To do this, mutalk proposes a combination of the following features:
+- **mutant selection strategies** randomize mutants to guarantee they are distributed over the application
+- **execution budgets** select how many mutants to run: a fixed number of mutants, a percentage of mutants, or a time budget.
+
+The following script shows how to run the analysis for only 10% of the mutants.
+This uses by default the order of mutant creation.
+As expected, 10% of the mutants run for 10% of the time of the original analysis, which is an aggressive optimization.
+
+```smalltalk
+analysis := MTAnalysis new
+    testClasses: testCases;
+    classesToMutate: classesToMutate;
+    budget: (MTPercentageOfMutantsBudget for: 10).
+
+t := [analysis run.] timeToRun. "0:00:00:24.648"
+```
+
+Things to think about:
+- Running less mutants should impact the mutation score. What was the impact on this analysis?
+- Can you run the analysis with an increasing number of percentages? what happens with the mutation score?
+- Check `MTRandomMutantSelectionStrategy` and its subclasses. What is their impact in the mutations and score?
 
 ### More exercises
 
@@ -304,7 +294,6 @@ Run mutation testing on it and think about the following questions:
 - is it well tested?
 - is there some trivial test missing that you could add?
 - How could you check if mutalk is produding *interesting* mutations? What if it's missing something important?
-
 
 ### Further?
 
