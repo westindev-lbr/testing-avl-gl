@@ -54,7 +54,7 @@ analysis run.
 ```
 
 Executing the previous code does have some interesting outcomes.
-First, we can ask the result for the mutation score. In this case, we have a score of 69, meaning that 69% of the mutants were killed.
+First, we can ask the result for the mutation score. In this case, we have a score of 37, meaning that 37% of the mutants were killed.
 
 ```smalltalk
 analysis generalResult mutationScore
@@ -118,45 +118,41 @@ Now that we have harvested the low-hanging fruits, we can try to write a test.
 For example, we see lots of mutations survived in the following method:
 
 ```smalltalk
-UUID >> < aMagnitude
-	"Answer whether the receiver is less than the argument."
+UUID >> fromString: aString
+	"Read a UUID from aString with my official representation, 32 lowercase hexadecimal (base 16) digits, displayed in five groups separated by hyphens, in the form 8-4-4-4-12 for a total of 36 characters (32 alphanumeric characters and four hyphens)"
 
-	self size = aMagnitude size ifFalse: [ ^ self size < aMagnitude size ].
-	1 to: self size do: [ :i |
-		(self at: i) = (aMagnitude at: i) ifFalse: [
-			^ (self at: i) < (aMagnitude at: i) ] ].
-	^ false
+	| uuid |
+	aString size ~= 36 ifTrue: [
+		self error: 'a UUID should be 36 characters' ].
+	uuid := self nilUUID.
+	uuid readFrom: aString readStream.
+	^ uuid
 ```
 
-This means that method is probably not covered at all.
-If we check the class `UUIDTest` we will find the following method:
+This means that method is probably not well covered.
+If we check, that method is only called with correct arguments, 36-long strings with the expected format.
 
 ```smalltalk
 UUIDTest >> testComparison
 	| a b |
 	a := UUID fromString: '0608b9dc-02e4-4dd0-9f8a-ea45160df641'.
 	b := UUID fromString: 'e85ae7ba-3ca3-4bae-9f62-cc2ce51c525e'.
+...
 
-	self assert: a equals: a copy.
-	self assert: a <= a copy.
-	self assert: a >= a copy.
-	self assert: b equals: b copy.
-	self assert: b <= b copy.
-	self assert: b >= b copy.
-	self assert: a < b.
-	self assert: a <= b.
-	self assert: b > a.
-	self assert: b >= a.
+UUIDTest >> testUUIDVersion5
 
-	self deny: a > b equals: b > a.
-	self deny: a >= b equals: b >= a
+	| uuid |
+	uuid := UUID fromString: 'edc460cf-4904-54cb-9add-47d7d6ac33f1'.
+...
+
+UUIDTest >> testUUIDVersion3
+
+	| uuid |
+	uuid := UUID fromString: 'a3bb189e-8bf9-3888-9912-ace4e6543002'.
+...
 ```
 
-Something not very obvious because this test is long, is that we are never comparing `a < a`!
-Thus, we never compare two uuids that are equal.
-In the same vein, we never compare `b < a`.
-
-3. add those cases in our test, run the analysis again and explore the results.
+3. add tests that will cover the missing branch, run the analysis again and explore the results.
 
 4. Extend the list of test classes to also include `UUIDGeneratorTest`, run the analysis again and analyse the survivors.
    - which ones look like equivalent mutants? why?
