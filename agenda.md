@@ -1,33 +1,62 @@
-## Week 1 (11/09)
+## Week 1
 
 ### Theory
 - Module 0 - testing refresher
+
+### Practice
+- Write chess tests
+- Can you focus on BICEP?
+
+### Homework
+- Watch MOOC videos on testing (https://advanced-design-mooc.pharo.org/#module2)
+- TP Task 1
+
+## Week 2
+
+### Theory
+- Test Driven Development
+
+### Practice
+- Write chess tests on TDD style
+
+### Homework
+- Watch MOOC videos on TDD (https://advanced-design-mooc.pharo.org/#module2)
+- TP Task 1
+
+## Week 3
+
+### Theory
 - Module 1 - mutation analysis
 
 ### Practice
-- Mutations with Mutalk
+- Mutation analysis practice
 
 ### Homework
-- finish the practice!
-- run mutation analysis on the practice's XML parser library
-  - can you find equivalent mutants?
-  - can you write a test to increase mutation score?
+- Run Mutation testing on the XML library
+- TP Task 2
 
-## Week 2 (18/09)
-
-### Theory
+## Week 4
 - Module 2 - introduction to fuzzing
 
 ### Practice
 - Fuzzing the date parser with Phuzzer
 
 ### Homework
-TBA
+- TP Task 2
+- TP Task 3
 
-## Week 3 (25/09)
+## Week 5
 - Module 3 - test oracles
 - Module 4 - differential testing
 
 ### Practice
 - Fuzzing the date parser with Phuzzer v2
-TBA
+
+### Homework
+- TP Task 3
+
+## Week 6
+- Fault Localization
+
+### Practice
+- Fault Localization practice
