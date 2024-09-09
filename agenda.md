@@ -2,10 +2,12 @@
 
 ### Theory
 - Module 0 - testing refresher
+- Test Driven Development
 
 ### Practice
 - Write chess tests
 - Can you focus on BICEP?
+- Write chess tests on TDD style
 
 ### Homework
 - Watch MOOC videos on testing (https://advanced-design-mooc.pharo.org/#module2)
@@ -14,13 +16,12 @@
 ## Week 2
 
 ### Theory
-- Test Driven Development
+Code Coverage
 
 ### Practice
-- Write chess tests on TDD style
+- Code coverage practice
 
 ### Homework
-- Watch MOOC videos on TDD (https://advanced-design-mooc.pharo.org/#module2)
 - TP Task 1
 
 ## Week 3
