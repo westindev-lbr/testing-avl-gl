@@ -20,24 +20,33 @@ MyPawn >> renderPieceOn: aSquare [
 { #category : 'rendering' }
 MyPawn >> targetSquaresLegal: aBoolean [
 
-	^ (self isWhite
+	| results |
+	results := #().
+
+	(self isWhite
 		   ifTrue: [
 			   (square name at: 2) = $2
 				   ifTrue: [
-					   (square up) ifNotNil: [ :p | p up ifNotNil: [ p up hasPiece ifFalse: [ { p . p up } ] ifTrue: [ { p } ] ] ]
+					   (square up) ifNotNil: [ :p | p up ifNotNil: [ :secondUp | results := results copyWith: p. secondUp hasPiece ifFalse: [ results := results copyWith: secondUp ] ] ]
 					]
 				   ifFalse: [ 
-						(square up) ifNotNil: [ :p | p hasPiece ifFalse: [ { p } ] ifTrue: [ {  } ] ]
+						(square up) ifNotNil: [ :p | p hasPiece ifFalse: [ results := results copyWith: p ]].
+						(square up) ifNotNil: [ :p | p right ifNotNil: [ :upRight | upRight hasPiece and: [ upRight contents color ~= color ifTrue: [ results := results copyWith: upRight ] ] ] ].
+						(square up) ifNotNil: [ :p | p left ifNotNil: [ :upLeft | upLeft hasPiece and: [ upLeft contents color ~= color ifTrue: [ results := results copyWith: upLeft ] ] ] ]
 					]
 			]
 		   ifFalse: [
 			   (square name at: 2) = $7
 				   ifTrue: [
-					   (square down) ifNotNil: [ :p | p down ifNotNil: [ p down hasPiece ifFalse: [ { p . p down } ] ifTrue: [ { p } ] ] ] 
+					   (square down) ifNotNil: [ :p | p down ifNotNil: [ :secondDown | results := results copyWith: p. secondDown hasPiece ifFalse: [ results := results copyWith: secondDown ] ] ] 
 					]
 				   ifFalse: [ 
-						(square down) ifNotNil: [ :p | p hasPiece ifFalse: [ { p } ] ifTrue: [ {  } ] ]
+						(square down) ifNotNil: [ :p | p hasPiece ifFalse: [ results := results copyWith: p ] ].
+						(square down) ifNotNil: [ :p | p right ifNotNil: [ :downRight | downRight hasPiece and: [ downRight contents color ~= color ifTrue: [ results := results copyWith: downRight ] ] ] ].
+						(square down) ifNotNil: [ :p | p left ifNotNil: [ :downLeft | downLeft hasPiece and: [ downLeft contents color ~= color ifTrue: [ results := results copyWith: downLeft ] ] ] ]
 					]
 			]
-		) select: [ :s | s notNil and: [ s hasPiece not or: [ s contents color ~= color ] ] ]
+		).
+		
+		^ results
 ]
