@@ -58,3 +58,20 @@ MyPawnTests >> testFirstMoveWhitePawn [
 MyPawnTests >> testId [
 	self assert: MyPawn new id equals: 'P'
 ]
+
+{ #category : 'tests' }
+MyPawnTests >> testIllegalMoveWhenHasPieceInFront [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+
+	| board wpawn bpawn wsquares bsquares |
+	board := MyChessBoard empty.
+	board at: 'c4' put: (wpawn := MyPawn white).
+	board at: 'c5' put: (bpawn := MyPawn black).
+	
+	wsquares := wpawn targetSquares.
+	bsquares := bpawn targetSquares.
+	
+	self assert: wsquares isEmpty equals: true.
+	self assert: bsquares isEmpty equals: true.	
+]
