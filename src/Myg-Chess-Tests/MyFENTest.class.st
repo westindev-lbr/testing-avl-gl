@@ -6,6 +6,18 @@ Class {
 }
 
 { #category : 'tests' }
+MyFENTest >> testFuzzerFEN [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+
+	| FENString |
+	10 timesRepeat: [ 
+		FENString := MyGrammarFENFuzzer new fuzzFEN.
+		Transcript show: FENString; cr.
+	].
+]
+
+{ #category : 'tests' }
 MyFENTest >> testParseBlackPawn [
 
 	| parser piece |
