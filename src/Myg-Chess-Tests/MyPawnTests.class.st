@@ -32,6 +32,28 @@ MyPawnTests >> testFirstMoveBlackPawn [
 ]
 
 { #category : 'tests' }
+MyPawnTests >> testFirstMoveBlackPawn2 [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+	
+	"should move forward of 2 cases if state of board is initial"
+	
+	| board tpawn squares |
+	board := MyChessBoard empty.
+	board at: 'a7' put: (tpawn := MyPawn black).
+	board at: 'a5' put: (MyPawn white).
+	
+	squares := tpawn targetSquares.
+	
+	self
+		assertCollection: squares
+		includesAll:
+			(#( a6 ) collect: [ :name |
+				 board at: name ])
+	
+]
+
+{ #category : 'tests' }
 MyPawnTests >> testFirstMoveWhitePawn [
 	"comment stating purpose of instance-side method"
 	"scope: class-variables  &  instance-variables"
@@ -51,6 +73,28 @@ MyPawnTests >> testFirstMoveWhitePawn [
 				 board at: name ])
 	
 
+	
+]
+
+{ #category : 'tests' }
+MyPawnTests >> testFirstMoveWhitePawn2 [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+	
+	"should move forward of 2 cases if state of board is initial"
+	
+	| board tpawn squares |
+	board := MyChessBoard empty.
+	board at: 'a2' put: (tpawn := MyPawn white).
+	board at: 'a4' put: (MyPawn black).
+	
+	squares := tpawn targetSquares.
+	
+	self
+		assertCollection: squares
+		includesAll:
+			(#( a3 ) collect: [ :name |
+				 board at: name ])
 	
 ]
 
@@ -108,6 +152,57 @@ MyPawnTests >> testMoveDiagonnalyToCapturePiecesSameColor [
 	wsquares := wpawn2 targetSquares.
 	
 	self assertCollection: wsquares includesAll: (#( e4 ) collect: [ :name | board at: name ]).
+
+]
+
+{ #category : 'tests' }
+MyPawnTests >> testMoveDiagonnalyToCapturePiecesSameColor2 [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+
+	| board wpawn wpawn2 wpawn3 wsquares |
+	board := MyChessBoard empty.
+	board at: 'd4' put: (wpawn := MyPawn black).
+	board at: 'e5' put: (wpawn2 := MyPawn black).
+	board at: 'f4' put: (wpawn3 := MyPawn black).
+	
+	wsquares := wpawn2 targetSquares.
+	
+	self assertCollection: wsquares includesAll: (#( e4 ) collect: [ :name | board at: name ]).
+
+]
+
+{ #category : 'tests' }
+MyPawnTests >> testMoveDiagonnalyToCapturePiecesSameColor3 [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+
+	| board wpawn wpawn2 wpawn3 wsquares |
+	board := MyChessBoard empty.
+	board at: 'd4' put: (wpawn := MyPawn white).
+	board at: 'e5' put: (wpawn2 := MyPawn black).
+	board at: 'f4' put: (wpawn3 := MyPawn black).
+	
+	wsquares := wpawn2 targetSquares.
+	
+	self assertCollection: wsquares includesAll: (#( e4 d4 ) collect: [ :name | board at: name ]).
+
+]
+
+{ #category : 'tests' }
+MyPawnTests >> testMoveDiagonnalyToCapturePiecesSameColor4 [
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+
+	| board wpawn wpawn2 wpawn3 wsquares |
+	board := MyChessBoard empty.
+	board at: 'd4' put: (wpawn := MyPawn black).
+	board at: 'e5' put: (wpawn2 := MyPawn black).
+	board at: 'f4' put: (wpawn3 := MyPawn white).
+	
+	wsquares := wpawn2 targetSquares.
+	
+	self assertCollection: wsquares includesAll: (#( e4 f4 ) collect: [ :name | board at: name ]).
 
 ]
 
